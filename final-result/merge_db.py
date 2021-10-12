@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os, sqlite3
+import os, sqlite3, sys, shutil
 
 class sqlMerge(object):
     """Basic python script to merge data of 2 !!!IDENTICAL!!!! SQL tables"""
@@ -19,6 +19,7 @@ class sqlMerge(object):
     def merge(self, file_a, file_b):
         db_a = sqlite3.connect(file_a)
 
+        print("Merging: " + file_b)
         db_a.execute("ATTACH '" + file_b + "' AS 'db_b'")
 
         try:
@@ -76,13 +77,18 @@ class sqlMerge(object):
 
     def batch_merge(self, directory):
         db_files = self.read_files(directory)
-        print(db_files[0])
+        result_file = os.path.join(directory, "merged.db")
+        shutil.copyfile(db_files[0], result_file)
+        print("db_basis: ", db_files[0])
+        print("merged_file_name: ", result_file)
         for db_file in db_files[1:]:
-            self.merge(db_files[0], db_file)
+            self.merge(result_file, db_file)
             # print(db_file)
+            continue
 
     def main(self):
-        self.batch_merge(".")
+        folder = sys.argv[1] if len(sys.argv) > 0 else "."
+        self.batch_merge(folder)
 
         return
 
