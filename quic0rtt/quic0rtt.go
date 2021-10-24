@@ -10,6 +10,25 @@ import (
 	"time"
 )
 
+const (
+	VersionDoQ00 = "doq-i00"
+	VersionDoQ01 = "doq-i01"
+	VersionDoQ02 = "doq-i02"
+	VersionDoQ03 = "doq-i03"
+	VersionDoQ04 = "doq-i04"
+	VersionDoQ05 = "doq-i05"
+	VersionDoQ06 = "doq-i06"
+)
+
+var DefaultDoQVersions = []string{VersionDoQ06, VersionDoQ05, VersionDoQ04, VersionDoQ03, VersionDoQ02, VersionDoQ01, VersionDoQ00}
+
+var DefaultQUICVersions = []quic.VersionNumber{
+	quic.Version1,
+	quic.VersionDraft34,
+	quic.VersionDraft32,
+	quic.VersionDraft29,
+}
+
 type clientSessionCache struct {
 	mutex sync.Mutex
 	cache map[string]*tls.ClientSessionState
@@ -46,7 +65,7 @@ func (c *clientSessionCache) Put(sessionKey string, cs *tls.ClientSessionState) 
 func Check0RTT(ip string, port int) (bool, error) {
 	tlsConf := &tls.Config{
 		InsecureSkipVerify: true,
-		NextProtos:         []string{"doq-i00", "doq-i02", "doq-i03", "doq"},
+		NextProtos:         DefaultDoQVersions,
 		VerifyPeerCertificate: cert.SkipHostnameVerification,
 	}
 
@@ -56,6 +75,7 @@ func Check0RTT(ip string, port int) (bool, error) {
 
 	quicConfig := &quic.Config{
 		HandshakeIdleTimeout: 2 * time.Second,
+		Versions: DefaultQUICVersions,
 		AcceptToken: func(clientAddr net.Addr, token *quic.Token) bool {
 			return true
 		},

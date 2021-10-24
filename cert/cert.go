@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"github.com/lucas-clemente/quic-go"
 	"net"
+	"tcpfastopen/quic0rtt"
 	"time"
 )
 
@@ -32,12 +33,11 @@ func GetQUICCert(ip string, port string) ([]*x509.Certificate, error) {
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify:    true,
 		VerifyPeerCertificate: SkipHostnameVerification,
-		NextProtos: []string{
-			"doq-i00", "doq-i01", "doq-i02",
-		},
+		NextProtos: quic0rtt.DefaultDoQVersions,
 	}
 	quicConfig := &quic.Config{
 		HandshakeIdleTimeout: 2 * time.Second,
+		Versions: quic0rtt.DefaultQUICVersions,
 	}
 	session, err := quic.DialAddr(ip + ":"+port, tlsConfig, quicConfig)
 	if err != nil {
