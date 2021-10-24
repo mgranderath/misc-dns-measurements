@@ -15,10 +15,10 @@ func GetVersion(ip string, port int) (*uint64, *string, error) {
 		VerifyPeerCertificate: func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
 			return nil
 		},
-		NextProtos: defaultDoQVersions,
+		NextProtos: DefaultDoQVersions,
 	},&quic.Config{
 		HandshakeIdleTimeout: time.Second * 2,
-		Versions: defaultQUICVersions,
+		Versions: DefaultQUICVersions,
 	})
 
 	if err != nil {
