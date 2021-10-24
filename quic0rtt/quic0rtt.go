@@ -2,11 +2,11 @@ package quic0rtt
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"github.com/lucas-clemente/quic-go"
 	"net"
 	"strconv"
 	"sync"
-	"tcpfastopen/cert"
 	"time"
 )
 
@@ -66,7 +66,9 @@ func Check0RTT(ip string, port int) (bool, error) {
 	tlsConf := &tls.Config{
 		InsecureSkipVerify: true,
 		NextProtos:         DefaultDoQVersions,
-		VerifyPeerCertificate: cert.SkipHostnameVerification,
+		VerifyPeerCertificate: func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+			return nil
+		},
 	}
 
 	gets := make(chan string, 100)
